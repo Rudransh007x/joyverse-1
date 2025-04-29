@@ -1,0 +1,364 @@
+/* Global Styles for BoggleGame */
+.boggle-game {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  padding: 20px;
+  transition: background 0.5s ease;
+}
+
+/* Emotion-Based Backgrounds */
+.boggle-game.bg-green-200 {
+  background: linear-gradient(135deg, #bef264, #86efac); /* Happy */
+}
+
+.boggle-game.bg-blue-200 {
+  background: linear-gradient(135deg, #7dd3fc, #3b82f6); /* Sad */
+}
+
+.boggle-game.bg-red-200 {
+  background: linear-gradient(135deg, #fb7185, #ef4444); /* Angry */
+}
+
+.boggle-game.bg-yellow-200 {
+  background: linear-gradient(135deg, #fef08a, #facc15); /* Surprised */
+}
+
+.boggle-game.bg-gray-200 {
+  background: linear-gradient(135deg, #e5e7eb, #9ca3af); /* Neutral */
+}
+
+.boggle-game.bg-purple-200 {
+  background: linear-gradient(135deg, #d8b4fe, #a855f7); /* Fear */
+}
+
+.boggle-game.bg-orange-200 {
+  background: linear-gradient(135deg, #fdba74, #f97316); /* Disgust */
+}
+
+/* Start Screen */
+.start-screen {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #a5f3fc, #22d3ee);
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+  color: #fff;
+}
+
+.start-screen h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.video-container {
+  margin: 20px 0;
+}
+
+.demo-video {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.play-demo,
+.play-again,
+.start-button {
+  background-color: #f472b6;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin: 10px;
+}
+
+.play-demo:hover,
+.play-again:hover,
+.start-button:hover {
+  background-color: #ec4899;
+  transform: scale(1.05);
+}
+
+/* Game Screen */
+.game-screen {
+  text-align: center;
+  padding: 20px;
+  background: #f1f5f9;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+}
+
+.game-screen h1 {
+  font-size: 2rem;
+  color: #1d4ed8;
+  margin-bottom: 15px;
+}
+
+/* Word List */
+.word-list {
+  margin: 15px 0;
+  font-size: 1.2rem;
+  color: #334155;
+}
+
+.word-list span {
+  padding: 5px 10px;
+  transition: all 0.3s;
+}
+
+.word-list .found {
+  color: #84cc16;
+  font-weight: bold;
+  text-decoration: line-through;
+  background: rgba(132, 204, 22, 0.2);
+}
+
+/* Level and Attempts */
+.level {
+  font-size: 1.1rem;
+  color: #9333ea;
+  margin: 10px 0;
+}
+
+.attempts {
+  font-size: 1.1rem;
+  color: #f43f5e;
+  margin: 10px 0;
+}
+
+/* Boggle Grid */
+.boggle-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 70px);
+  gap: 15px;
+  justify-content: center;
+  margin: 20px auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.cell {
+  width: 70px;
+  height: 70px; /* Fixed invalid height value */
+  background: linear-gradient(145deg, #e0e7ff, #f1f5f9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e293b;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+}
+
+.cell:hover {
+  background: linear-gradient(145deg, #bae6fd, #7dd3fc);
+  transform: scale(1.05);
+}
+
+.cell.selected {
+  border: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.3);
+  color: #1e293b;
+  transform: scale(1.1);
+}
+
+.cell.dragging {
+  border: 3px solid #14b8a6;
+  background: rgba(20, 184, 166, 0.3);
+  color: #1e293b;
+  transform: scale(1.1);
+}
+
+.cell.correct {
+  border: 3px solid #22c55e;
+  background: rgba(34, 197, 94, 0.3);
+  color: #1e293b;
+  animation: flash 0.5s ease-in-out;
+}
+
+.cell.hint {
+  border: 3px solid #a855f7;
+  background: rgba(168, 85, 247, 0.3);
+  color: #1e293b;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes flash {
+  0% {
+    background: rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    background: rgba(34, 197, 94, 0.8);
+  }
+  100% {
+    background: rgba(34, 197, 94, 0.3);
+  }
+}
+
+/* Message */
+.message {
+  font-size: 1.2rem;
+  color: #dc2626;
+  margin: 15px 0;
+  min-height: 24px;
+}
+
+/* Buttons */
+.next-level-button {
+  background-color: #6366f1;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.next-level-button:hover {
+  background-color: #4f46e5;
+  transform: scale(1.05);
+}
+
+.exit-button {
+  background-color: #f87171;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.exit-button:hover {
+  background-color: #ef4444;
+  transform: scale(1.05);
+}
+
+/* Confetti Canvas */
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Facemesh Container */
+.facemesh-container {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+}
+
+.camera-error {
+  background-color: #ffe6e6;
+  color: #d32f2f;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.camera-error button {
+  background-color: #d32f2f;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.3s;
+}
+
+.camera-error button:hover {
+  background-color: #b71c1c;
+}
+
+.emotion-display {
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .boggle-grid {
+    grid-template-columns: repeat(5, 50px);
+    gap: 10px;
+  }
+
+  .cell {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .start-screen h1,
+  .game-screen h1 {
+    font-size: 1.8rem;
+  }
+
+  .play-demo,
+  .play-again,
+  .start-button,
+  .next-level-button,
+  .exit-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+
+  .word-list {
+    font-size: 1rem;
+  }
+
+  .facemesh-container {
+    top: 5px;
+    left: 5px;
+  }
+
+  .emotion-display {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+}
