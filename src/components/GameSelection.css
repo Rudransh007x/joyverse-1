@@ -1,0 +1,292 @@
+/* src/components/GameSelection.css */
+.selection-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .selection-title {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 3rem;
+    font-family: 'Comic Sans MS', cursive;
+  }
+  
+  .games-grid {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+  }
+  
+  .game-holder {
+    position: relative;
+    width: 300px;
+    margin-top: 100px;
+  }
+  
+  /* Animal Styling */
+  .animal {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+  }
+  
+  /* Koala */
+  .koala .head {
+    width: 120px;
+    height: 100px;
+    background: #e0e0e0;
+    border-radius: 50%;
+    position: relative;
+  }
+  
+  .koala .ear {
+    width: 40px;
+    height: 40px;
+    background: #c0c0c0;
+    border-radius: 50%;
+    position: absolute;
+    top: -15px;
+  }
+  
+  .koala .ear.left {
+    left: 5px;
+  }
+  
+  .koala .ear.right {
+    right: 5px;
+  }
+  
+  .koala .face {
+    position: absolute;
+    width: 80px;
+    height: 70px;
+    background: #f0f0f0;
+    border-radius: 50%;
+    top: 25px;
+    left: 20px;
+  }
+  
+  .koala .eyes {
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    top: 20px;
+    left: 10px;
+  }
+  
+  .koala .eyes::before,
+  .koala .eyes::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: #333;
+    border-radius: 50%;
+  }
+  
+  .koala .eyes::before {
+    left: 5px;
+  }
+  
+  .koala .eyes::after {
+    right: 5px;
+  }
+  
+  .koala .nose {
+    position: absolute;
+    width: 20px;
+    height: 15px;
+    background: #333;
+    border-radius: 50%;
+    top: 40px;
+    left: 30px;
+  }
+  
+  .koala .arm {
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    background: #c0c0c0;
+    border-radius: 10px;
+    top: 70px;
+  }
+  
+  .koala .arm.left {
+    left: -40px;
+    transform: rotate(-30deg);
+    animation: hold-left 2s infinite;
+  }
+  
+  .koala .arm.right {
+    right: -40px;
+    transform: rotate(30deg);
+    animation: hold-right 2s infinite;
+  }
+  
+  /* Panda */
+  .panda .head {
+    width: 120px;
+    height: 100px;
+    background: white;
+    border: 3px solid #333;
+    border-radius: 50%;
+    position: relative;
+  }
+  
+  .panda .ear {
+    width: 40px;
+    height: 40px;
+    background: #333;
+    border-radius: 50%;
+    position: absolute;
+    top: -15px;
+  }
+  
+  .panda .ear.left {
+    left: 5px;
+  }
+  
+  .panda .ear.right {
+    right: 5px;
+  }
+  
+  .panda .face {
+    position: absolute;
+    width: 80px;
+    height: 70px;
+    background: rgb(255, 255, 255);
+    border: 2px solid #333;
+    border-radius: 50%;
+    top: 25px;
+    left: 20px;
+  }
+  
+  .panda .eyes {
+    position: absolute;
+    width: 60px;
+    height: 30px;
+    top: 15px;
+    left: 10px;
+  }
+  
+  .panda .eyes::before,
+  .panda .eyes::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: #333;
+    border-radius: 50%;
+  }
+  
+  .panda .eyes::before {
+    left: 0;
+  }
+  
+  .panda .eyes::after {
+    right: 0;
+  }
+  
+  .panda .nose {
+    position: absolute;
+    width: 20px;
+    height: 15px;
+    background: #333;
+    border-radius: 50%;
+    top: 40px;
+    left: 30px;
+  }
+  
+  .panda .arm {
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    background: #333;
+    border-radius: 10px;
+    top: 70px;
+  }
+  
+  .panda .arm.left {
+    left: -40px;
+    transform: rotate(-30deg);
+    animation: hold-left 2s infinite 0.5s;
+  }
+  
+  .panda .arm.right {
+    right: -40px;
+    transform: rotate(30deg);
+    animation: hold-right 2s infinite 0.5s;
+  }
+  
+  /* Game Cards */
+  .game-card {
+    display: block;
+    padding: 2rem;
+    border-radius: 15px;
+    text-decoration: none;
+    color: white;
+    font-family: 'Comic Sans MS', cursive;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .game-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .game-card p {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+  
+  .boggle-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .fruit-card {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+  
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  }
+  
+  /* Animations */
+  @keyframes hold-left {
+    0%, 100% {
+      transform: rotate(-30deg) translateY(0);
+    }
+    50% {
+      transform: rotate(-25deg) translateY(-5px);
+    }
+  }
+  
+  @keyframes hold-right {
+    0%, 100% {
+      transform: rotate(30deg) translateY(0);
+    }
+    50% {
+      transform: rotate(35deg) translateY(-5px);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }

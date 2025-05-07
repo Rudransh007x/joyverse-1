@@ -1,94 +1,83 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import * as faceMesh from '@mediapipe/face_mesh';
 import * as cameraUtils from '@mediapipe/camera_utils';
 
-const useEmotionDetection = (videoRef, canvasRef, emotionDisplayRef, startCamera, onEmotionsCollected, setCameraError) => {
+const useEmotionDetection = (options = {}) => {
+  const {
+    videoRef,
+    canvasRef,
+    emotionDisplayRef,
+    startCamera = false,
+    onEmotionsCollected = () => {},
+    onError = () => {}
+  } = options;
+
   const [emotionQueue, setEmotionQueue] = useState([]);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const isProcessing = useRef(false);
   const cameraRef = useRef(null);
+  const faceMeshRef = useRef(null);
 
-  useEffect(() => {
-    console.log('useEmotionDetection - startCamera:', startCamera, 'videoRef.current:', videoRef.current);
-    if (!startCamera || !videoRef.current) {
-      console.log('useEmotionDetection - Camera not started: startCamera=', startCamera, 'videoRef.current=', videoRef.current);
-      return;
+  // Validate refs and camera access
+  const validateRefs = useCallback(() => {
+    if (!videoRef?.current) {
+      throw new Error('Video ref is not initialized');
     }
+    if (!canvasRef?.current) {
+      throw new Error('Canvas ref is not initialized');
+    }
+  }, [videoRef, canvasRef]);
 
-    const faceMeshInstance = new faceMesh.FaceMesh({
+  // Initialize FaceMesh
+  const initializeFaceMesh = useCallback(() => {
+    faceMeshRef.current = new faceMesh.FaceMesh({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
     });
 
-    faceMeshInstance.setOptions({
+    faceMeshRef.current.setOptions({
       maxNumFaces: 1,
       refineLandmarks: true,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
 
-    faceMeshInstance.onResults((results) => {
-      if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-        const detectedLandmarks = results.multiFaceLandmarks[0].map((lm) => ({
-          x: lm.x,
-          y: lm.y,
-          z: lm.z,
-        }));
+    return faceMeshRef.current;
+  }, []);
 
-        // Log landmarks on every frame
-        console.log('useEmotionDetection - Detected 468 Landmarks:', detectedLandmarks);
-        console.log('useEmotionDetection - Number of landmarks:', detectedLandmarks.length);
-        console.log('useEmotionDetection - Sample landmark (first point):', detectedLandmarks[0]);
+  // Process FaceMesh results
+  const processResults = useCallback((results) => {
+    if (results.multiFaceLandmarks?.length > 0) {
+      const detectedLandmarks = results.multiFaceLandmarks[0].slice(0, 468).map((lm) => ({
+        x: lm.x,
+        y: lm.y,
+        z: lm.z,
+      }));
 
-        // Process landmarks if not already processing
-        if (!isProcessing.current) {
-          isProcessing.current = true;
-
-          sendLandmarksToServer(detectedLandmarks)
-            .then((detectedEmotion) => {
-              console.log('useEmotionDetection - Emotion received from server:', detectedEmotion);
-              setEmotionQueue((prev) => {
-                const newQueue = [...prev, detectedEmotion].slice(-4);
-                onEmotionsCollected(newQueue);
-                return newQueue;
-              });
-              isProcessing.current = false;
-            })
-            .catch((err) => {
-              console.error('useEmotionDetection - Error sending landmarks:', err.message);
-              // Log error instead of setting cameraError
-              isProcessing.current = false;
+      if (!isProcessing.current) {
+        isProcessing.current = true;
+        
+        sendLandmarksToServer(detectedLandmarks)
+          .then((detectedEmotion) => {
+            setEmotionQueue((prev) => {
+              const newQueue = [...prev, detectedEmotion].slice(-4);
+              onEmotionsCollected(newQueue);
+              return newQueue;
             });
-        }
-      } else {
-        console.log('useEmotionDetection - No face landmarks detected');
+          })
+          .catch((err) => {
+            console.error('Emotion detection error:', err);
+            onError(err.message);
+          })
+          .finally(() => {
+            isProcessing.current = false;
+          });
       }
-    });
+    }
+  }, [onEmotionsCollected, onError]);
 
-    const camera = new cameraUtils.Camera(videoRef.current, {
-      onFrame: async () => {
-        await faceMeshInstance.send({ image: videoRef.current });
-      },
-      width: 640,
-      height: 480,
-    });
-    cameraRef.current = camera;
-
-    camera.start().catch((err) => {
-      console.error('useEmotionDetection - Camera Error:', err);
-      setCameraError('Failed to access webcam. Please allow camera access.');
-    });
-
-    return () => {
-      if (cameraRef.current) {
-        cameraRef.current.stop();
-      }
-      faceMeshInstance.close();
-    };
-  }, [startCamera, videoRef, onEmotionsCollected, setCameraError]);
-
-  const sendLandmarksToServer = async (landmarks) => {
+  // Send landmarks to server
+  const sendLandmarksToServer = useCallback(async (landmarks) => {
     try {
-      landmarks=landmarks.slice(0,468);
-      console.log('useEmotionDetection - Sending landmarks to server:', landmarks.slice(0, 10), '...');
       const response = await fetch('http://localhost:5000/', {
         method: 'POST',
         headers: {
@@ -99,7 +88,7 @@ const useEmotionDetection = (videoRef, canvasRef, emotionDisplayRef, startCamera
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -109,12 +98,69 @@ const useEmotionDetection = (videoRef, canvasRef, emotionDisplayRef, startCamera
 
       return data.emotion;
     } catch (err) {
-      console.error('useEmotionDetection - Fetch Error:', err);
+      console.error('Failed to send landmarks:', err);
       throw err;
     }
-  };
+  }, []);
 
-  return emotionQueue;
+  // Initialize camera
+  const initializeCamera = useCallback(async () => {
+    try {
+      validateRefs();
+      const faceMeshInstance = initializeFaceMesh();
+      
+      faceMeshInstance.onResults((results) => {
+        if (canvasRef.current) {
+          // Draw results to canvas if needed
+          // canvasCtx.current.save();
+          // canvasCtx.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          // canvasCtx.current.drawImage(results.image, 0, 0, canvasRef.current.width, canvasRef.current.height);
+          // canvasCtx.current.restore();
+        }
+        processResults(results);
+      });
+
+      const camera = new cameraUtils.Camera(videoRef.current, {
+        onFrame: async () => {
+          await faceMeshInstance.send({ image: videoRef.current });
+        },
+        width: 640,
+        height: 480,
+      });
+
+      cameraRef.current = camera;
+      await camera.start();
+      setIsCameraReady(true);
+      
+    } catch (err) {
+      console.error('Camera initialization failed:', err);
+      onError(err.message);
+      setIsCameraReady(false);
+    }
+  }, [validateRefs, initializeFaceMesh, processResults, videoRef, canvasRef, onError]);
+
+  // Main effect
+  useEffect(() => {
+    if (!startCamera) return;
+
+    initializeCamera();
+
+    return () => {
+      if (cameraRef.current) {
+        cameraRef.current.stop();
+      }
+      if (faceMeshRef.current) {
+        faceMeshRef.current.close();
+      }
+      setIsCameraReady(false);
+    };
+  }, [startCamera, initializeCamera]);
+
+  return {
+    emotionQueue,
+    isCameraReady,
+    restartCamera: initializeCamera,
+  };
 };
 
 export default useEmotionDetection;
